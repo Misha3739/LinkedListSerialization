@@ -57,9 +57,9 @@ namespace LinkedListSerialization.Tests
 
             Assert.That(result.Contains("<ListNode>"));
 
-            Assert.That(result.Contains("<Prev = \"\"/>"));
-            Assert.That(result.Contains("<Next = \"\"/>"));
-            Assert.That(result.Contains("<Rand = \"\"/>"));
+            Assert.That(result.Contains("<Prev></Prev>"));
+            Assert.That(result.Contains("<Next></Next>"));
+            Assert.That(result.Contains("<Rand></Rand>"));
 
             Assert.That(result.Contains("</ListNode>"));
 
@@ -86,9 +86,9 @@ namespace LinkedListSerialization.Tests
 
             Assert.That(result.Contains("<ListNode>"));
 
-            Assert.That(result.Contains("<Prev = \"prev\"/>"));
-            Assert.That(result.Contains("<Next = \"next\"/>"));
-            Assert.That(result.Contains("<Rand = \"rand\"/>"));
+            Assert.That(result.Contains("<Prev>prev</Prev>"));
+            Assert.That(result.Contains("<Next>next</Next>"));
+            Assert.That(result.Contains("<Rand>rand</Rand>"));
 
             Assert.That(result.Contains("</ListNode>"));
 

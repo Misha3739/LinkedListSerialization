@@ -10,6 +10,23 @@ namespace LinkedListSerialization.Tests
     [TestFixture]
     public class ListBehaviour
     {
+        [TestCase("value1",ExpectedResult = true)]
+        [TestCase("value2", ExpectedResult = true)]
+        [TestCase("value3", ExpectedResult = true)]
+        [TestCase("value6", ExpectedResult = false)]
+        [TestCase("value7", ExpectedResult = false)]
+        [TestCase("value8", ExpectedResult = false)]
+        public bool SearchIsCorrect(string searchValue)
+        {
+            var listRand = new ListRand();
+            
+            listRand.AddNewToTheEnd(new ListNode("value1"));
+            listRand.AddNewToTheEnd(new ListNode("value2"));
+            listRand.AddNewToTheEnd(new ListNode("value3"));
+
+            return listRand.Search(searchValue) != null;
+        }
+
         [Test]
         public void CanAddNewToEmptyList()
         {

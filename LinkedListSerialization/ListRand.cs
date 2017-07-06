@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace LinkedListSerialization
 {
@@ -61,6 +64,12 @@ namespace LinkedListSerialization
             return null;
         }
 
+        public ListNode Search(string nodeValue)
+        {
+            var node = new ListNode(nodeValue);
+            return Search(node);
+        }
+
 
         public void Serialize(FileStream s)
         {
@@ -83,14 +92,16 @@ namespace LinkedListSerialization
             }
         }
 
-       internal string SerializeSingleItem(ListNode node)
+        static readonly Type s_nodeType = typeof(ListNode);
+
+        internal string SerializeSingleItem(ListNode node)
         {
 
             StringBuilder sb = new StringBuilder();
-            Type nodeType = typeof(ListNode);
-            var properties = nodeType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+          
+            var properties = s_nodeType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
-            sb.AppendLine($"<{nodeType.Name}>");
+            sb.AppendLine($"<{s_nodeType.Name}>");
 
             if (node != null)
             {
@@ -102,23 +113,78 @@ namespace LinkedListSerialization
                         prop.Name == nameof(ListNode.Rand))
                     {
                         var refData = (value as ListNode)?.Data;
-                        sb.AppendLine($"<{prop.Name} = \"{refData}\"/>");
+                        sb.AppendLine($"<{prop.Name}>{refData}</{prop.Name}>");
                     }
                     else
                     {
-                        sb.AppendLine($"<{prop.Name} = \"{value}\"/>");
+                        sb.AppendLine($"<{prop.Name}>{value}</{prop.Name}>");
                     }
                 }
             }
-            sb.AppendLine($"</{nodeType.Name}>");
+            sb.AppendLine($"</{s_nodeType.Name}>");
             return sb.ToString();
         }
 
         public void Deserialize(FileStream s)
         {
+            Head = Tail = null;
+
+            StreamReader reader = new StreamReader(s);
+            string content = reader.ReadToEnd();
+            content = content.Replace("\r\n", "");
+            var listItems = GetSubStrings(content,$"<{s_nodeType.Name}>",$"</{s_nodeType.Name}>").ToList();
+
+            foreach (var listNode in listItems)
+            {
+                var node = ParseSingleNode(listNode);
+                AddNewToTheEnd(node);
+            }
+
+            foreach (var listNode in listItems)
+            {
+                UpdateRandomReferences(listNode);
+            }
+        }
+
+        private ListNode ParseSingleNode(string nodeSerialized)
+        {
+            var prop =
+                s_nodeType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .Single(x => x.Name == nameof(ListNode.Data));
+
+            var value = GetSubString(nodeSerialized, $"<{prop.Name}>", $"</{prop.Name}>");
+
+             return new ListNode(value);
 
         }
 
-        
+        private void UpdateRandomReferences(string nodeSerialized)
+        {
+            var randProperty = s_nodeType.GetProperties(BindingFlags.Instance | BindingFlags.Public).Single(x => x.Name == nameof(ListNode.Rand));
+            var dataProperty = s_nodeType.GetProperties(BindingFlags.Instance | BindingFlags.Public).Single(x => x.Name == nameof(ListNode.Data));
+
+            var randValue = GetSubString(nodeSerialized, $"<{randProperty.Name}>", $"</{randProperty.Name}>");
+            var dataValue = GetSubString(nodeSerialized, $"<{dataProperty.Name}>", $"</{dataProperty.Name}>");
+
+
+            var existedRefRandomNode = Search(randValue);
+            var tempValue = Search(dataValue);
+            tempValue.Rand = existedRefRandomNode;
+        }
+
+        private IEnumerable<string> GetSubStrings(string input, string start, string end)
+        {
+            string regex = $"{Regex.Escape(start)}(.*?){Regex.Escape(end)}";
+
+            return Regex.Matches(input, regex, RegexOptions.Singleline)
+                .Cast<Match>()
+                .Select(match => match.Groups[1].Value);
+        }
+
+        private string GetSubString(string input, string start, string end)
+        {
+           return GetSubStrings(input,start,end).FirstOrDefault();
+        }
+
     }
 }

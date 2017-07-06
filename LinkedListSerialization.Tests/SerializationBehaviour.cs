@@ -3,6 +3,7 @@ using NUnit.Framework;
 
 namespace LinkedListSerialization.Tests
 {
+
     [TestFixture]
     public class SerializationBehaviour
     {
@@ -11,16 +12,7 @@ namespace LinkedListSerialization.Tests
         [OneTimeSetUp]
         public void SetUp()
         {
-            try
-            {
-                using (File.Create(s_file))
-                {
-                    
-                }
-            }
-            catch
-            {
-            }
+           
         }
 
         [Test]

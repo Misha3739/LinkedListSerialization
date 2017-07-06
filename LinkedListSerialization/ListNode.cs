@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LinkedListSerialization
+﻿namespace LinkedListSerialization
 {
    public class ListNode
     {
@@ -12,7 +6,7 @@ namespace LinkedListSerialization
 
         public ListNode Next { get; set; }
 
-        public ListNode Rand { get; set; } // произвольный элемент внутри списка
+        public ListNode Rand { get; set; } 
 
         public string Data { get; }
 
